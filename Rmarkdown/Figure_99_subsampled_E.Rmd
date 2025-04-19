@@ -1,0 +1,59 @@
+---
+title: "depth_condition_dilution"
+output: html_document
+date: "2025-04-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = FALSE,warning = FALSE)
+```
+
+
+```{r,message=F, warning=TRUE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+
+#LOAD DATA
+path='../data/'
+data=read.table(paste0(path,'Figure_99_subsampled_E.tsv'), header=T)#, na.strings = "NA")
+
+
+data <- data %>%
+        mutate(protocol = recode(protocol, Zhou_2P = "Zhou et al. 09", Zhou_3P = "Zhou et al. 12", 
+                                 Rambo_3P ="Rambo-Martin et al", Licheri_5uM="Current study"))
+
+#to ensure the plots are ordered properly
+data$protocol <- factor(data$protocol,levels = c("Zhou et al. 09","Zhou et al. 12", 
+                    "Rambo-Martin et al","Current study"))
+
+data$gene[is.na(data$gene)] <- "NA"
+order=c("MP",'NS',"NA",'NP','HA','PA','PB1','PB2')
+data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),levels =order)
+
+#function to determine max and minimum values for heatmap
+round_value <- function(value) {
+  ifelse(x %% 1 < 0.5, floor(x), ceiling(x))
+}
+
+max=ceiling(max(data$depth_log10))
+min = floor (min(data$depth_log10))
+
+figure <- ggplot(data, aes(x=dilution, y=gene, fill= depth_log10)) + 
+                geom_tile() +
+                geom_text(aes(label = depth_log10), color = "black", size = 2) +
+                scale_fill_gradient(low='#fecc5c',high="#bd0026",limits=c(min, max)) + 
+                facet_wrap(~protocol,nrow=1)+
+                labs(fill='Depth (log10)') +
+                theme_classic() +
+                  theme(
+                    axis.text = element_text(color='black',size=12),
+                    axis.title = element_blank(),
+                    strip.text = element_text(size = 12, color='black'),
+                    legend.text = element_text(size=12),legend.position = 'bottom')
+ggsave(paste0(path,'../Figures/Figure_99_subsampled_E.pdf'),plot= figure,dpi=600,width=10,height=4)
+
+```
+
+

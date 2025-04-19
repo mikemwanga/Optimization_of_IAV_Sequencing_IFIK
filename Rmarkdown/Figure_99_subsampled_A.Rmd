@@ -1,0 +1,72 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,warning=FALSE, message=FALSE)
+```
+
+
+```{r,warning=FALSE, message=FALSE}
+pacman::p_load(ggplot2,grid, ggpubr,reshape,data.table)
+```
+
+```{r}
+path='../data/'
+data = read.table(paste0(path, 'Figure_99_subsampled_AB.tsv'), header=TRUE)
+
+#Generate average number of IAV virus and non-IAV virus reads for each dilution and protocol
+#Using standard devition for based on total number of reads
+summarised_data = data %>%
+  group_by(condition, dilution) %>%
+    summarise(mean_total_reads = mean(total_reads),N=n(),
+              mean_assembled_reads = mean(total_assembled),
+              mean_non_virus_reads = mean(non_virus_reads),
+              sd_total_reads = sd(total_reads),
+              SE_tota_reads = sd_total_reads/sqrt(N)) %>%
+    mutate(ymax_total_reads = mean_total_reads + SE_tota_reads,
+          ymin_total_reads = mean_total_reads - SE_tota_reads)
+
+#Just a function to restructure the data for ease of plotting
+process_plot <- function(protocol){
+      df = summarised_data %>% filter(condition == protocol)
+      df = df %>% select(dilution,mean_assembled_reads, mean_non_virus_reads,
+                         ymax_total_reads,ymin_total_reads) %>%
+    tidyr::pivot_longer(cols=c(mean_assembled_reads, mean_non_virus_reads), names_to=c('variable'))
+    return(df)
+}
+
+plot_image <- function(data){
+      order=c('mean_non_virus_reads','mean_assembled_reads')
+      fig <- ggplot(data,aes(x=dilution, y=value,fill=factor(variable, levels=order) ))  +
+                    geom_bar(stat='identity', width = 0.55, position ='stack')+ 
+                    labs(fill='',y = 'Average No. of Reads',x='Dilution', title = '') +
+                     scale_y_continuous(limits = c(0, 12000),labels=c("0","25","50","75","100","125"))+ 
+                    geom_errorbar(aes(ymax = ymax_total_reads, ymin=ymin_total_reads),width = 0.4)+
+                    theme_classic()+
+                    scale_fill_manual(values = c("mean_non_virus_reads"="#b2182b", "mean_assembled_reads"="#bababa"),
+                                      labels = c("mean_non_virus_reads" = "Non-Viral",
+                                                 "mean_assembled_reads" = "Viral"))+
+                    theme(axis.title.y = element_blank(),axis.title.x = element_blank(),
+                          plot.title = element_text(hjust = 0.5, size=8, color = 'black', face='bold'),
+                          axis.text = element_text(size=9, color='black')) +
+                    guides(color = guide_legend(override.aes = list(size=5)))
+      return(fig)
+}
+
+L5 = plot_image(process_plot('Licheri_5uM'))
+R3 = plot_image(process_plot( 'Rambo_3P'))
+Z3 = plot_image(process_plot('Zhou_3P'))
+Z2 = plot_image(process_plot('Zhou_2P'))
+
+
+figure = ggarrange(Z2,Z3,R3,L5,nrow=1, common.legend = T,legend='top',font.label=list(size=10,face='bold'),
+                   labels=c('Zhou et al. 09','Zhou et al. 12','Rambo et al','Current Study'))
+final_plot <- annotate_figure(figure, 
+                  left = text_grob('No. of Sampled Reads \n (x100)',rot=90, size = 11),
+              bottom = text_grob("Dilution", size = 11))
+
+ggsave(paste0(path,'../Figures/Figure_99_subsampled_A.pdf'),plot= final_plot, width=10, height=3)
+```

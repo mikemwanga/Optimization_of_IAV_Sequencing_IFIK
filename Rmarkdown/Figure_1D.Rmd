@@ -1,0 +1,51 @@
+---
+title: "depth_condition_dilution"
+output: html_document
+date: "2025-04-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message = TRUE, cache=TRUE)
+```
+
+```{r}
+#load relevant libraries
+pacman::p_load(dplyr,ggplot2,grid,ggpubr) 
+
+#read data
+data=read.table('../data/figure_1D_data.tsv', header=T, na.strings = "NA")
+
+#rename protocols accordingly
+data <- data %>%
+        mutate(protocol = recode(protocol, Zhou_2P = "Zhou et al. 2009", Zhou_3P = "Zhou et al. 2012", 
+                                 Rambo_3P ="Rambo-Martin et al", Licheri_5uM="Current study"))
+
+#to ensure the plots are ordered properly
+data$protocol <- factor(data$protocol,levels = c("Zhou_2P"="Zhou et al. 2009","Zhou_3P"="Zhou et al. 2012", 
+                    "Rambo_3P"="Rambo-Martin et al","Licheri_5uM"="Current study"))
+
+data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),
+                    levels = c('MP','NS','NA','NP','HA','PA','PB1','PB2'))
+
+#generate figures using ggplot
+figure <- ggplot(data, aes(x=dilution, y=gene, fill= depth_log10)) + 
+              geom_tile() +
+              facet_wrap(~protocol,nrow=1) +
+              geom_text(aes(label = depth_log10), color = "black", size = 2) +
+              scale_fill_gradient(low='#ffffcc',high="red",
+                                  limits=c(2, 6)) +
+              labs(fill='Depth (log10)') +
+              theme_classic() +
+                theme(
+                  axis.text = element_text(color='black',size=12),
+                  axis.title = element_blank(),
+                  strip.text = element_text(size = 12, color='black'),
+                  legend.text = element_text(size=12),
+                  legend.position = 'bottom')
+
+#save the figure
+ggsave('../Figures/Figure_1D.pdf',plot= figure,dpi=600,width=10,height=4)
+
+```
+
+
