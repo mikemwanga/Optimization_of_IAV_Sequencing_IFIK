@@ -1,0 +1,168 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(stringr)
+library(tidyr)
+library(egg)
+```
+
+```{r}
+data = read.table('../data/read_data.tsv', header=TRUE)
+
+summarised_data = data %>%
+  group_by(condition, dilution) %>%
+    summarise(mean_total_reads = mean(total_reads),N=n(),
+              mean_assembled_reads = mean(total_assembled),
+              mean_non_virus_reads = mean(non_virus_reads),
+              sd_total_reads = sd(total_reads),
+              sd_total_assembled_reads = sd(total_assembled),
+              sd_non_virus_reads = sd(non_virus_reads),
+              SE_tota_reads = sd_total_reads/sqrt(N),
+              SE_tota_assembled_reads = sd_total_assembled_reads/sqrt(N),
+              SE_non_virus_reads=sd_non_virus_reads/sqrt(N)) %>%
+  
+    mutate( ymax_assembled = mean_assembled_reads + SE_tota_assembled_reads,
+          ymin_assembled = mean_assembled_reads - SE_tota_assembled_reads,
+          ymax_non_virus = mean_non_virus_reads + SE_non_virus_reads,
+          ymin_non_virus = mean_non_virus_reads - SE_non_virus_reads,
+          ymax_total_reads = mean_total_reads + SE_tota_reads,
+          ymin_total_reads = mean_total_reads - SE_tota_reads)
+
+summarised_data_clean <- summarised_data %>% filter(condition != 'Licheri_2uM') %>%
+                    select(dilution,mean_assembled_reads, mean_non_virus_reads,
+                         ymax_total_reads,ymin_total_reads) %>%
+    tidyr::pivot_longer(cols=c(mean_assembled_reads, mean_non_virus_reads), names_to=c('variabl2e'))
+
+summarised_data_clean$condition <- factor(summarised_data_clean$condition, 
+                                levels=c("Zhou_2P","Zhou_3P","Rambo_3P","Licheri_5uM"),
+                                labels=c("Zhou et al. 2009",'Zhou et al. 2012',"Rambo-Martin et al. 2020",
+                                         "Current protocol"))
+
+
+axis_text=8
+axistitlesize=8
+barsize=0.65
+
+
+order_values=c('mean_non_virus_reads','mean_assembled_reads')
+
+conditions_figure <- ggplot(summarised_data_clean, aes(x=dilution, y=value, fill=factor(variabl2e, levels=order_values))) +
+            scale_y_continuous(limits = c(0, 250000),
+                      labels=c("0","50","100","150","200","250")) +
+            geom_bar(stat='identity', width =barsize, position ='stack') +
+            facet_wrap(~condition, nrow=1)  +
+            labs(fill='',y = 'Average No. of Reads (x1000)')+
+              geom_errorbar(aes(ymax = ymax_total_reads, ymin=ymin_total_reads),width =0.3)  +
+              theme_classic() +
+              scale_fill_manual(values = c("mean_non_virus_reads"="#b2182b", "mean_assembled_reads"="#bababa"),
+                    labels = c("mean_non_virus_reads" = "Non-Viral",
+                               "mean_assembled_reads" = "Viral"))  +
+            theme(legend.position=c(0.3,0.90),
+                  legend.background = element_blank(),legend.spacing.x = unit(3, "cm"),
+                  legend.box.background=element_rect(color="black", size=0.2),
+                  legend.box.margin = margin(-20, 0, -3, 0),
+                    axis.title.x = element_blank(),
+                    axis.title.y = element_text(size=axistitlesize),
+                    strip.background = element_blank(),
+                  strip.text = element_text(size=9, vjust=-0.3, face='bold'),
+                    axis.text = element_text(size=axis_text, color='black'),
+                    legend.key.size = unit(0.3,"cm"),
+                    legend.text = element_text(size = 8)) +
+                guides(fill = guide_legend(nrow = 1)) 
+
+path='../data/'
+data_raw = read.table(paste0(path, 'gene_count_edited.tsv'), header=TRUE)
+
+data_raw = data_raw %>% filter(protocol != 'Licheri_2uM') 
+
+#with viral
+summarised_data = data_raw %>%  mutate(non_viral =total_reads-total_assembled ) %>%
+        select(Dilution,protocol,non_viral,PB2,PB1,PA, HA,NP,NA.,MP,NS) %>%
+        pivot_longer(cols = c(non_viral,HA, MP, "NA.", NP, NS, PA, PB1, PB2), names_to="variable", values_to='value')  %>%
+        group_by(protocol, Dilution,variable) %>%
+        summarise(avg_value = mean(value, na.rm = TRUE), .groups = "drop" ) %>%
+          group_by(protocol, Dilution) %>%
+          mutate(proportion = 100 * avg_value / sum(avg_value, na.rm = TRUE) )
+            
+
+#with non-viral
+data <- data_raw %>% pivot_longer(cols = c(HA, MP, "NA.", NP, NS, PA, PB1, PB2),  # adjust gene column names as needed
+               names_to = "variable",
+               values_to = "value") %>% 
+            group_by(protocol, Dilution, variable) %>%
+          summarise(avg_value = mean(value, na.rm = TRUE), .groups = "drop" ) %>%
+          group_by(protocol, Dilution) %>%
+        mutate(proportion = 100* avg_value / sum(avg_value, na.rm = TRUE))
+
+
+protocol_labels <- c(
+  "Zhou_2P" = "Zhou et al. 2009",  "Licheri_5uM" = "Current protocol",
+  "Zhou_3P" = "Zhou et al. 2012",  "Rambo_3P" = "Rambo-Martin et al. 2020")
+
+#COLORCODED PLOT
+colorcode=c("Non-Viral"='black',"PA"='#a1d99b','PB1'='#e0bb2b', 'PB2'='#238b45', 'HA'='#e31a1c','NP'='#9e9ac8',
+            'MP'='#1d91c0','NS'='#41b6c4','NA'="#fd8d3c")
+
+dilutionorder=c('E1','E2')
+order=c('Non_Viral','PB2','PB1','PA','HA','NP','NA','MP','NS')
+
+generate_proportion_figure <- function(data,y_title){
+  
+        data$Dilution <- factor(data$Dilution, levels = c('E1','E2','E3','E4','E5','E6' ))
+        dilutionorder=c('E1','E2','E3','E4','E5')
+        order=c('non_viral','PB2','PB1','PA','HA','NP','NA','MP','NS')
+        data$variable[data$variable == "NA."] <- "NA"
+        data$protocol <- factor(data$protocol, 
+                                levels=c("Zhou_2P","Zhou_3P","Rambo_3P","Licheri_5uM"),
+                                labels=c("Zhou et al. 2009",'Zhou et al. 2012',"Rambo-Martin et al. 2020",
+                                         "Current protocol"))
+        
+        figure <- ggplot(data, aes(fill=factor(variable,levels=order,
+                                               labels = c('Non-Viral','PB2','PB1','PA','HA','NP','NA','MP','NS')),
+                                   x=Dilution, y=proportion)) +  
+            geom_bar(position="stack", stat="identity",width =barsize) +
+            labs(fill='',y=y_title) +
+            facet_wrap(~protocol, nrow=1) +
+            scale_fill_manual(values=colorcode) +
+          theme_classic() +
+          theme(axis.title.x = element_blank(),
+                axis.title.y = element_text(size=axistitlesize),
+                legend.position = 'bottom',
+                strip.text = element_blank(),
+                axis.text = element_text(size=axis_text, color='black'),
+                strip.background = element_blank(),
+                legend.key.size = unit(0.3,"cm"),
+                  legend.text = element_text(size = 8)) +
+          guides(fill = guide_legend(nrow = 1)) 
+          
+        return(figure)
+  
+}
+
+proportion_viral_plot <- generate_proportion_figure(summarised_data,'Proportion of Reads')
+
+
+
+#merge the plots
+merged_figure <- ggarrange(conditions_figure, proportion_viral_plot, nrow=2)
+ggsave(paste0('../Figures/Figure1.pdf'),plot= merged_figure, width=190, height=130, units='mm')
+
+
+```
+
+
