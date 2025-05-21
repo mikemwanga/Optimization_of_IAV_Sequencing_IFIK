@@ -1,0 +1,74 @@
+---
+title: "depth_condition_dilution"
+output: html_document
+date: "2025-04-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,message=F, warning=TRUE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+
+```
+
+
+```{r}
+
+path='../data'
+data_raw = read.table(paste0(path, '/minimap_depth_summary.tsv'), header=TRUE)
+
+depth_data <- data_raw %>%  select(-(condition)) %>% tidyr::pivot_longer(-c(protocol, Dilution), 
+                                                                names_to = 'gene', values_to = 'depth') %>%
+                    group_by(protocol, gene, Dilution) %>%
+                    summarise(depth_log10 = round(log10(mean(depth)),1))
+  
+data <- depth_data %>% filter(depth_log10 != -Inf)
+data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),
+                    levels = c('NS', 'MP','NA','NP','HA','PA','PB1','PB2'))
+
+#data$gene[is.na(data$gene)] <- "NA"
+
+order=c( 'NS',"MP","NA",'NP','HA','PA','PB1','PB2')
+data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),levels =order)
+data$protocol <- factor(as.character(data$protocol),levels=c("Zhou_2P","Zhou_3P","Rambo_3P","Licheri_5uM"),
+                        labels=c('Zhou et al., 2009','Zhou et al., 2012','Rambo-Martin et al., 2020','Current protocol'))
+
+#function to determine max and minimum values for heatmap
+round_value <- function(value) {
+  ifelse(x %% 1 < 0.5, floor(x), ceiling(x))
+}
+
+
+max=ceiling(max(data$depth_log10))
+min = floor (min(data$depth_log10))
+
+axis_text=10
+axistitlesize=10
+barsize=0.65
+
+
+
+figure <- ggplot(data, aes(x=Dilution, y=gene, fill= depth_log10)) + 
+  geom_tile() +
+  geom_text(aes(label = depth_log10), color = "black", size = 2) +
+  scale_fill_gradient(low='#fecc5c',high="#bd0026",limits=c(min, max)) +
+  facet_wrap(~protocol,nrow=1)+
+  labs(fill='Depth (log10)') +
+  theme_classic() +
+    theme(
+      axis.text = element_text(color='black',size=axistitlesize),
+      axis.title = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_text(size = 9, color='black', face='bold'),
+      legend.text = element_text(size=axistitlesize),legend.position = 'bottom')
+ggsave(paste0('../Figures/supplementary_2A.pdf'),plot= figure,dpi=600,width=10,height=4)
+
+```
+
+
