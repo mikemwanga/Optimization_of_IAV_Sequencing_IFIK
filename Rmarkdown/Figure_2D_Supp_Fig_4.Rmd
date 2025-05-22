@@ -1,0 +1,149 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(patchwork)
+```
+
+
+```{r}
+db_path='../data/'
+subtype <- read.table('../data/influenza_subtypes.tsv', sep='\t', header=T)
+
+
+bcd_order <-  c("A/avian/17", "A/avian/23", "A/avian/12", "A/avian/20", "A/avian/11", "A/avian/19", "A/avian/14",
+                "A/avian/02", "A/human/20", "A/human/17", "A/human/22", "A/human/18", "A/human/23", "A/human/19",
+                "A/human/21", "A/human/24", "A/swine/12", "A/swine/23", "A/swine/24",
+                "A/swine/11", "A/swine/05","A/swine/09", "A/swine/18", "A/swine/06")
+
+title_size=6
+axis_text_size=5
+barwidth=0.75
+
+process_data <- function(data,title){
+        summarised_data_raw <- data %>% dplyr::rename(virus = total_assembled,proportion_virus = assembled) %>%
+                          mutate(non_virus = total_reads - virus,percentage_non_virus = non_virus/total_reads*100 ) 
+        
+        #summarised_data_raw <- summarised_data_raw %>%
+                              #  filter(! sample %in% c('A/avian/14', 'A/avian/02', 'A/human/21', 'A/swine/06',
+                                                      # 'A/swine/18'))
+
+        summarised_data <- summarised_data_raw %>%
+                          select(sample,virus, non_virus) %>%
+                          tidyr::pivot_longer(cols=c(virus,non_virus), names_to=c('variable'))
+        
+        summarised_data_proportion <- summarised_data_raw %>% 
+                                      select(sample, percentage_non_virus, proportion_virus)%>%
+                          tidyr::pivot_longer(cols=c(proportion_virus,percentage_non_virus), names_to=c('variable'))
+        
+        figure <- ggplot(summarised_data,aes(x=value,y=factor(sample,levels=rev(bcd_order)),fill = variable))  +
+          geom_bar(stat='identity', width = barwidth, position ='stack') +
+          theme_classic() +
+          labs(fill='',title=title,x='Number of Reads') +
+          scale_fill_manual(values = c("non_virus"="#b2182b", "virus"="#bababa"),
+                            labels = c("non_virus" = "Non-Viral",
+                                       "virus" = "Viral"))+
+          theme(axis.title.y = element_blank(),
+                axis.title.x = element_text(size=axis_text_size),
+                plot.title = element_text(hjust = 0.5, size=title_size, color = 'black', face='bold'),
+                legend.text = element_text(size=axis_text_size,color='black'),
+                legend.key.size = unit(0.3,"cm"),
+                axis.text = element_text(size=axis_text_size, color='black')) #+
+          
+        
+        
+        
+        figure_proportion <- ggplot(summarised_data_proportion,
+                                    aes(x=value,y=factor(sample,levels=rev(bcd_order)),fill = variable))  +
+          geom_bar(stat='identity', width =barwidth, position ='stack') +
+          theme_classic() +
+          labs(fill='',title=title,x='Proportion of Reads (%)') +
+          scale_fill_manual(values = c("percentage_non_virus"="#b2182b", "proportion_virus"="#bababa"),
+                            labels = c("percentage_non_virus" = "Non-Viral",
+                                       "proportion_virus" = "Viral"))+
+          theme(axis.title.y = element_blank(),axis.title.x = element_text(size=axis_text_size),
+                plot.title = element_text(hjust = 0.5, size=title_size, color = 'black', face='bold'),
+                legend.text = element_text(size=axis_text_size,color='black'),
+                legend.key.size = unit(0.3,"cm"),
+                axis.text = element_text(size=axis_text_size, color='black'))
+
+        return(list(absolute=figure, proportion=figure_proportion))
+        
+        
+}
+
+mbt_path=db_path
+
+db_data = read.table(paste0(db_path, 'Figure_DB_2D.tsv'), header=TRUE)
+mbt_data = read.table(paste0(mbt_path, 'Figure_SB_2D.tsv'), header=TRUE)
+
+
+db_figures <- process_data(db_data, 'Dual-barcode')
+mbt_figures <- process_data(mbt_data, 'Single-barcode')
+
+
+sb_figure_edited <-mbt_figures$absolute +
+                      guides(y.sec = ggh4x::guide_axis_manual(
+                                breaks = subtype$samplename, labels =subtype$CP_value)) +
+                    theme(axis.line.y.right =element_blank(), axis.ticks.y.right = element_blank())
+
+
+db_figure_edited <- db_figures$absolute +
+                      guides(y.sec = ggh4x::guide_axis_manual(
+                                breaks = subtype$samplename, labels =subtype$subtype), label='vcvdf')+
+                      theme(axis.line.y=element_blank(),axis.text.y.left = element_blank(),
+                            axis.ticks.y = element_blank())
+
+############
+#Propotion figures
+sb_figure_propottion <-mbt_figures$proportion +
+                      guides(y.sec = ggh4x::guide_axis_manual(
+                                breaks = subtype$samplename, labels =subtype$CP_value)) +
+                    theme(axis.line.y.right =element_blank(), axis.ticks.y.right = element_blank())
+
+db_figure_proportion <- db_figures$proportion +
+                      guides(y.sec = ggh4x::guide_axis_manual(
+                                breaks = subtype$samplename, labels =subtype$subtype), label='vcvdf')+
+                      theme(axis.line.y=element_blank(),axis.text.y.left = element_blank(),
+                            axis.ticks.y = element_blank())
+
+
+
+combined_plot <- sb_figure_edited+ db_figure_edited +
+  plot_layout(ncol = 2,widths=1, heights = 1, guides = 'collect')  &
+  theme(legend.position ="bottom") &
+  guides(fill = guide_legend(override.aes = list(size=0.5)))
+
+
+combined_plot_proportion <- sb_figure_propottion + db_figure_proportion +
+  plot_layout(ncol = 2,widths=1, heights = 1, guides = 'collect')  &
+  theme(legend.position ="bottom") &
+  guides(fill = guide_legend(override.aes = list(size=0.5)))
+
+
+
+export_plot <- function(figure, name){
+  ggsave(paste0(db_path,name),plot= figure, width=120, height=90, units = 'mm')
+}
+
+export_plot(combined_plot,'../Figures/Figure_2D.pdf')
+export_plot(combined_plot_proportion,'../Figures/Supplementary_Figure_4A.pdf')
+
+
+```
+
+

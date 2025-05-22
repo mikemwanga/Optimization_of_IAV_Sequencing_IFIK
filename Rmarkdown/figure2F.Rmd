@@ -1,0 +1,111 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,warning=FALSE, message=FALSE, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(purrr)
+```
+
+
+```{r}
+
+#LOAD READ COUNT DATA PER GENE
+path='../data/'
+sb <- read.table(paste0(path, 'Figure_DB_2F.tsv'), header=TRUE)
+db <- read.table(paste0(path, 'Figure_SB_2F.tsv'), header=TRUE)
+
+sb$primer <- "sb"
+db$primer <- "db"
+
+data_merged_raw <- rbind(sb,db)
+
+data_merged <- data_merged_raw %>% filter(! sample %in% c('A/avian/14', 'A/avian/02', 'A/human/21', 'A/swine/06',
+                                                       'A/swine/18','A/swine/05'))
+
+gene_order=c('PB2','PB1','PA','HA','NP','NA','NS','MP')
+colorcode=c("PA"='#a1d99b','PB1'='#e0bb2b', 'PB2'='#238b45', 'HA'='#e31a1c','NP'='#9e9ac8',
+            'MP'='#1d91c0','NS'='#41b6c4','NA'="#fd8d3c")
+primer_order <- c('sb','db')
+pane_spc=0.4
+barwidth=0.5
+
+sample_order <-  c("A/avian/17", "A/avian/23", "A/avian/12", "A/avian/20", "A/avian/11", "A/avian/19",
+                   "A/avian/14", "A/avian/02", "A/human/20", "A/human/17", "A/human/22",
+               "A/human/18", "A/human/23", "A/human/19", "A/human/21", "A/human/24", "A/swine/12",
+               "A/swine/23", "A/swine/24", "A/swine/11", "A/swine/05",
+               "A/swine/09", "A/swine/18", "A/swine/06")
+
+generate_plots <- function(name) {
+        data <- data_merged %>% filter(host == name) %>% select(sample,primer, PB2, PB1,PA,HA,NP,'NA.',NS,MP) %>%  
+                        tidyr::pivot_longer(cols = -c(sample,primer), names_to = "gene", values_to = "reads") %>%
+                          group_by(sample,primer) %>%
+                        mutate(proportion=100 * reads / sum(reads)) %>% ungroup()
+        
+        data$gene[data$gene == "NA."] <- "NA"
+        df2 = data
+        
+        figure_proportion <- ggplot(df2) +
+                        geom_bar(aes(x = factor(primer,levels=primer_order), 
+                                     y = proportion,fill=factor(gene,levels=gene_order)),
+                                 width = barwidth, stat = "identity") +
+                        labs(fill='',y='Proportion of Reads (%)') +scale_fill_manual(values=colorcode) +
+                        facet_grid(~ sample, switch = "x") + theme_classic() +
+                         theme(strip.placement = "outside",
+                               strip.text = element_text(size=7),
+                              strip.background = element_rect(fill = NA, color = "white"),
+                              panel.spacing = unit(pane_spc,"cm"), #-.05
+                              axis.title.x = element_blank(),
+                              axis.title.y=element_text(size=8),
+                              axis.text = element_text(size=8, color='black'),
+                              legend.key.size = unit(0.4,"cm"),
+                              legend.position='right',
+                              legend.text = element_text(size = 7)
+                              )
+        
+        figure_reads <- ggplot(df2) +
+                        geom_bar(aes(x = factor(primer,levels=primer_order),
+                                     y = reads,fill=factor(gene,levels=gene_order)),
+                                 width = barwidth,stat = "identity") +
+                        labs(fill='',y='No. of Reads') + scale_fill_manual(values=colorcode) +
+                          scale_y_continuous()+
+                        facet_grid(~ sample, switch = "x") + theme_classic() +
+                         theme(strip.placement = "outside",
+                               strip.text = element_text(size=7),
+                              strip.background = element_rect(fill = NA, color = "white"),
+                              panel.spacing = unit(pane_spc,"cm"),
+                              axis.title.x = element_blank(),
+                              axis.title.y=element_text(size=8),
+                              axis.text = element_text(size=8, color='black'),
+                              legend.key.size = unit(0.3,"cm"),
+                              legend.text = element_text(size = 7),#legend.direction="vertical",
+                              legend.position='right',
+                              )
+        
+        host_figure_merge <- ggarrange(figure_reads, figure_proportion, ncol = 1, nrow = 2,
+                                             common.legend = T,legend='right',align = "v")
+        
+        ggsave(paste0('../Figures/Figure_2F_',name,'.pdf'),
+                                  plot=host_figure_merge, width=6, height=4)
+}
+
+
+generate_plots('avian')
+generate_plots('human')
+generate_plots('swine')
+
+
+```
+

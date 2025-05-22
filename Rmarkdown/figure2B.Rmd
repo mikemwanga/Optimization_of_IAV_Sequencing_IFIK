@@ -1,0 +1,62 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,warning=FALSE, message=FALSE, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(stringr)
+```
+
+
+```{r}
+#MINIMAP COVERAGE
+path='../data'
+
+axis_text_size=6
+data_raw <- read.table(paste0(path, '/Figure_2B.tsv'),header=TRUE)
+bcd_order <- paste0("BC",str_pad(1:24,2,pad="0"))
+  
+data  <- data_raw %>% tidyr::pivot_longer(cols= c(PB2,PB1,PA,HA,NP,"NA.",NS,MP),names_to = 'gene')
+data$gene[data$gene == "NA."] <- "NA"
+        
+data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),
+                            levels = c('PB2','PB1','PA','HA','NP','NA','MP','NS'))
+        
+data$value <- round(log10(data$value),1 )
+data$value[data$value == -Inf] <- 0
+        
+figure <- ggplot(data, aes(x=gene, y=factor(sample,levels = rev(bcd_order)), fill= value)) + 
+          geom_tile() +
+          geom_text(aes(label = value), color = "black", size=2)  +
+          scale_fill_gradient2(low= '#fff5eb',high="#bd0026",limits=c(0, 5),midpoint = 0.1, mid='#fecc5c') +
+          labs(fill='Depth\n(log10)',title='Dual-barcode') +
+          theme_classic() +
+          scale_x_discrete(position='top')+
+          theme(
+            plot.title = element_text(size=6, color='black'),
+            axis.title = element_blank(),
+            axis.text = element_text(color='black',size=axis_text_size),
+            legend.title = element_text(size=6,color='black'),
+            legend.text = element_text(size=5,color='black'),legend.position = 'left',
+            legend.background = element_blank(),
+            legend.box.margin = margin(0,-5, 0, 0)
+          ) +
+          guides(fill = guide_colorbar(barwidth=0.4, barheight = 5))
+        
+ggsave(paste0('../Figures/Figure_2B.pdf'),plot= figure,width=90,height=90, units="mm")
+
+
+```
+

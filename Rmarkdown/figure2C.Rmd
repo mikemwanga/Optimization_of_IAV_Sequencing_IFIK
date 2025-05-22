@@ -1,0 +1,67 @@
+---
+title: "depth_condition_dilution"
+output: html_document
+date: "2025-04-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,message=FALSE, warning=TRUE)
+```
+
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(stringr)
+library(data.table)
+
+```
+
+```{r}
+generate_figures <- function(file){
+        path='../data/'
+        axis_text_size=6
+        data_raw <- read.table(paste0(path,file), header=T)
+        data_raw <- data_raw %>%
+                                mutate(sample = str_split(sample, "_", simplify = TRUE)[,1])
+              
+        data  <- data_raw %>% tidyr::pivot_longer(cols= c(PB2,PB1,PA,HA,NP,"NA.",NS,MP),names_to = 'gene')
+        data$gene[data$gene == "NA."] <- "NA"
+              
+        data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),
+                                  levels = c('PB2','PB1','PA','HA','NP','NA','MP','NS'))
+        bcd_order <- paste0("BC",str_pad(1:24,2,pad="0"))
+              
+        figure <- ggplot(data, aes(x=gene, y=factor(sample,levels = rev(bcd_order)), fill= value)) + 
+                geom_tile() +
+                geom_text(aes(label = value), color = "black", size =2) +
+                scale_fill_gradient2(low= '#edf8b1',high="#0ab896",limits=c(0, 100)) +
+                labs(fill='Coverage', title='Dual-barcode') +
+                theme_classic() + 
+                scale_x_discrete(position='top')+
+                theme(
+                  axis.title = element_blank(),
+                  axis.text = element_text(color='black',size=axis_text_size),
+                  plot.title = element_text(size=axis_text_size, color='black'),
+                  legend.title = element_text(size=axis_text_size,color='black'),
+                  legend.text = element_text(size=5,color='black'),legend.position = 'right',
+                  legend.background = element_blank(),
+                    legend.box.margin = margin(0,-5, 0, 0)
+                ) +
+                guides(fill = guide_colorbar(barwidth =0.4, barheight = 5))
+}
+
+figure_2c <- generate_figures('Figure_2C.tsv')
+
+supp_figure_3b <- generate_figures('supplementary_figure_3B.tsv')
+
+
+ggsave(paste0('../Figures/Figure_2C.pdf'),plot= figure_2c,dpi=600,width=90,height=90, units="mm")
+ggsave(paste0('../Figures/Supplementary_Figure_3B.pdf'),plot= supp_figure_3b ,dpi=600,width=90,height=90, units="mm")
+
+     
+```
+
+

@@ -1,0 +1,139 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=F)
+```
+
+
+```{r,warning=FALSE, message=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(purrr)
+library(stringr)
+
+```
+
+
+#GENERATE LINE COVERAGE FOR EVERY HOST FOR EVERY PROTOCOL
+```{r}
+path='../data/'
+
+label_map <- c("IFIK-17"="A/human/17","IFIK-18"="A/human/18","IFIK-19"="A/human/19","IFIK-20"="A/human/20",
+               "IFIK-21"="A/human/21",
+               "IFIK-22"="A/human/22","IFIK-23"="A/human/23","IFIK-24"="A/human/24","swIAV-05"="A/swine/05",
+               "swIAV-06"="A/swine/06",
+               "swIAV-09"="A/swine/09","swIAV-11"="A/swine/11","swIAV-12"="A/swine/12","swIAV-18"="A/swine/18",
+               "swIAV-23"="A/swine/23",
+               "swIAV-24"="A/swine/24","AIV-02"="A/avian/02","AIV-11"="A/avian/11","AIV-12"="A/avian/12",
+               "AIV-14"="A/avian/14",
+               "AIV-17"="A/avian/17","AIV-19"="A/avian/19","AIV-20"="A/avian/20","AIV-23"="A/avian/23")
+
+bcd_order <-  c("A/avian/17", "A/avian/23", "A/avian/12", "A/avian/20", "A/avian/11", "A/avian/19", 
+                "A/avian/14", "A/avian/02", "A/human/20","A/human/17", "A/human/22","A/human/18",
+                "A/human/23", "A/human/19", "A/human/21", "A/human/24", "A/swine/12", 
+                "A/swine/23", "A/swine/24", "A/swine/11", "A/swine/05","A/swine/09", "A/swine/18", "A/swine/06")
+
+process_data <- function(files) {
+      # Read and merge files
+      merged_files <- map_df(files, function(f) {
+        df <- read.table(f, sep = "\t",col.names = c('sample','position','depth'))
+        df <- df %>% mutate(gene = str_split(sample, "_", simplify = TRUE)[,3], 
+                            sample = str_split(sample, "_", simplify = TRUE)[,1])
+        
+      })
+      merged_files$sample <- sub("^(DB|SB)-IFIK", "IFIK", merged_files$sample)
+      merged_files$sample <- sub("^(DB|SB)-AIV", "AIV", merged_files$sample)
+      merged_files$sample <- sub("^(DB|SB)-swIAV", "swIAV", merged_files$sample)
+      merged_files = merged_files %>% filter(sample != "")
+      
+      merged_files$gene[merged_files$gene == "NA."] <- "NA"
+              
+      merged_files$gene <- factor(replace(as.character(merged_files$gene), is.na(merged_files$gene), "NA"),
+                                  levels = c('PB2','PB1','PA','HA','NP','NA','MP','NS'))
+      merged_files$sample <- label_map[merged_files$sample]
+      merged_files <- merged_files %>% filter(! sample %in% c('A/avian/14', 'A/avian/02', 'A/human/21', 'A/swine/06',
+                                                       'A/swine/18','A/swine/05'))
+      return(merged_files)
+}
+
+
+#GENERATE FUNCTION FOR PLOTS
+
+colorcode=c("PA"='#a1d99b','PB1'='#e0bb2b', 'PB2'='#238b45', 'HA'='#e31a1c','NP'='#9e9ac8',
+            'MP'='#1d91c0','NS'='#41b6c4','NA'="#fd8d3c")
+
+generate_plot <- function(data,title) {
+      figure <- ggplot(data, aes(x = position,y = log10(depth), group = gene, colour= gene)) +
+              geom_line(stat='identity') +
+              facet_wrap(~sample, nrow=1)+#,scales = "free_x") +
+              scale_color_manual(values = colorcode) +theme_light()+
+              labs(title=title,fill = "",y = "Sequencing Depth (log10)", x = "Genome position") + 
+              theme(
+                legend.key.size = unit(0.5, "cm"),legend.text = element_text(size=10),
+                legend.title = element_blank(),axis.title.y = element_blank(),
+                axis.text = element_text(size=10,color='black'),
+                strip.text = element_text(size = 10, color='black'),
+               strip.background = element_blank(),panel.grid = element_blank(),
+                plot.margin = margin(10,10,0,0)) +
+              guides(color = guide_legend(override.aes = list(size = 1)))+
+              scale_x_continuous(breaks = c(1, 1000,2000)) +
+              scale_y_continuous(limits=c(0,5))
+      return(figure)
+}
+
+
+main_path = path
+db_path='dual_barcode_coverage/'
+
+db_human <- list.files(paste0(main_path, db_path), pattern = "^DB-IFIK.*", full.names = TRUE)
+db_avian<- list.files(paste0(main_path, db_path), pattern = "^DB-AIV.*mapping_stats\\.txt$", full.names = TRUE)
+db_swine<- list.files(paste0(main_path ,db_path), pattern = "^DB-swIA.*mapping_stats\\.txt$", full.names = TRUE)
+
+#mbt_files
+mbt_path='single_barcode_coverage/'
+mbt_human <- list.files(paste0(main_path, mbt_path), pattern = "^SB-IFIK.*mapping_stats\\.txt$", full.names = TRUE)
+mbt_avian<- list.files(paste0(main_path ,mbt_path), pattern = "^SB-AIV.*mapping_stats\\.txt$", full.names = TRUE)
+mbt_swine<- list.files(paste0(main_path ,mbt_path), pattern = "^SB-swIA.*mapping_stats\\.txt$", full.names = TRUE)
+
+
+db_human_figure <- generate_plot(process_data(db_human), 'Dual-barcoding')
+db_swine_figure <- generate_plot(process_data(db_swine), 'Dual-barcoding')
+db_avian_figure <- generate_plot(process_data(db_avian), 'Dual-barcoding')
+
+mbt_human_figure <- generate_plot(process_data(mbt_human), 'Single-barcoding')
+mbt_swine_figure <- generate_plot(process_data(mbt_swine), 'Single-barcoding')
+mbt_avian_figure <- generate_plot(process_data(mbt_avian), 'Single-barcoding')
+
+arrange_figures <- function(figure1, figure2){
+  figure <- ggarrange(figure1,figure2, common.legend=T,legend='right',ncol = 1, nrow =2, align='hv') %>%
+                annotate_figure( left= text_grob("Sequencing Depth (log10)", size = 14,rot=90))
+}
+
+avian_figure <- arrange_figures(mbt_avian_figure, db_avian_figure)
+swine_figure <-arrange_figures(mbt_swine_figure, db_swine_figure)
+human_figure <- arrange_figures(mbt_human_figure, db_human_figure) 
+
+
+export_plot <- function(name, figure){
+  ggsave(paste0('../Figures/',name),plot= figure,width=11.7, height=5.3, units = 'in')
+}
+
+export_plot('supplementary_figure_5_avian.pdf',avian_figure )
+export_plot('supplementary_figure_5_swine.pdf',swine_figure )
+export_plot('supplementary_figure_5_human.pdf',human_figure )
+
+```
+
+
+
+
+
+

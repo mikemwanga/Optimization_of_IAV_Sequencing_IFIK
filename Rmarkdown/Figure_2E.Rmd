@@ -1,0 +1,125 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,warning=FALSE, message=FALSE, echo =FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(stringr)
+library(patchwork)
+```
+
+
+```{r}
+
+bcd_order <-  c("A/avian/17", "A/avian/23", "A/avian/12", "A/avian/20", "A/avian/11", "A/avian/19", 
+                "A/avian/14", "A/avian/02", "A/human/20","A/human/17", "A/human/22","A/human/18",
+                "A/human/23", "A/human/19", "A/human/21", "A/human/24", "A/swine/12", 
+                "A/swine/23", "A/swine/24", "A/swine/11", "A/swine/05","A/swine/09", "A/swine/18", "A/swine/06")
+```
+
+
+### Depth Heatmaps for the two protocols.
+
+```{r}
+
+path='../data/'
+db_path= path
+
+### Coverage Heatmaps for the two protocols.
+
+data_db <- read.table(paste0(path,'Figure_DB_2E.tsv'), header=T)
+data_mbt <- read.table(paste0(path,'Figure_SB_2E.tsv'), header=T)
+subtype <- read.table(paste0(path, '/influenza_subtypes.tsv'), sep='\t', header=T)
+
+
+title_size=6
+axis_text_size=5
+geom_text_size=1.5
+process_data <- function(data_raw,title){
+        data  <- data_raw %>% tidyr::pivot_longer(cols= c(PB2,PB1,PA,HA,NP,"NA.",NS,MP),names_to = 'gene')
+        data <- merge(data, subtype, by.x='sample',by.y='samplename', all.x=T)
+        #data <- data %>% filter(! sample %in% c('A/avian/14', 'A/avian/02', 'A/human/21', 'A/swine/06',
+            #                                        'A/swine/18','A/swine/05'))
+        data$gene[data$gene == "NA."] <- "NA"
+        data$gene <- factor(replace(as.character(data$gene), is.na(data$gene), "NA"),
+                            levels = c('PB2','PB1','PA','HA','NP','NA','MP','NS'))
+      return(data)        
+}
+
+
+data_db_clean <- process_data(data_db)
+data_sb_clean <- process_data(data_mbt)
+
+sb_figure <- ggplot(data_sb_clean, aes(x=gene, y=factor(sample,levels = rev(bcd_order)), fill= value)) + 
+          geom_tile() +
+          geom_text(aes(label = value), color = "black", size = geom_text_size) +
+          scale_fill_gradient2(low= '#edf8b1',high="#0ab896",limits=c(0, 100)) +
+          labs(title = 'Single-barcode', fill='Coverage') +
+          theme_classic() + 
+          scale_x_discrete(position='top') +
+          guides(y.sec = ggh4x::guide_axis_manual(
+                      breaks = subtype$samplename, labels = subtype$CP_value)) +
+          theme(
+            plot.title = element_text(size=title_size, face='bold'),
+            axis.line.y.right = element_blank(),
+            axis.ticks.y.right =element_blank(),
+            axis.title = element_blank(),
+            axis.text = element_text(color='black',size=axis_text_size),
+            legend.title = element_text(size=axis_text_size,color='black'),
+            legend.text = element_text(size=axis_text_size,color='black'),legend.position = 'bottom'
+          ) +
+          guides(fill = guide_colorbar(barwidth=5, barheight = 0.5))
+        
+
+
+db_figure <- ggplot(data_db_clean, aes(x=gene, y=factor(sample,levels = rev(bcd_order)), fill= value)) + 
+          geom_tile() +
+          geom_text(aes(label = value), color = "black", size =geom_text_size) +
+          scale_fill_gradient2(low= '#edf8b1',high="#0ab896",limits=c(0, 100)) +
+          labs(title = 'Dual-barcode', fill='Coverage') +
+          theme_classic() + 
+          scale_x_discrete(position='top')+
+          theme(
+            axis.line.y = element_blank(),
+            plot.title = element_text(size=title_size, face='bold'),
+            axis.ticks.y =element_blank(),
+            axis.title = element_blank(),
+            axis.text.y.left=element_blank(),
+            axis.text = element_text(color='black',size=axis_text_size),
+            legend.title = element_text(size=axis_text_size,color='black'),
+            legend.text = element_text(size=axis_text_size,color='black'),legend.position = 'bottom') +
+            
+          guides(y.sec = ggh4x::guide_axis_manual(
+                      breaks = subtype$samplename, labels = subtype$subtype))
+
+
+combined_plot2 <- sb_figure + db_figure +
+  plot_layout(ncol = 2,widths=1, heights = 1, guides = 'collect') & 
+  theme(legend.position = 'bottom',
+        legend.background = element_blank(),
+            legend.box.margin = margin(0,0, 0, 0)) &
+  guides(fill = guide_colorbar(barwidth=5, barheight = 0.4)) 
+
+
+
+
+export_plot <- function(figure, name){
+  ggsave(paste0(db_path,name),plot= figure, width=120, height=90, units = 'mm')
+}
+
+export_plot(combined_plot2, '../Figures/Figure_2E.pdf')
+
+```
+
