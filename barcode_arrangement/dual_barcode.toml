@@ -1,0 +1,27 @@
+[arrangement]
+name = "db"
+kit = "dualBC-IAV"
+
+mask1_front = "CAGCACCTGGTGCTG"
+mask1_rear = "AGTAGAAACAAGG"
+mask2_front = "CAGCACCTGGTGCTG"
+mask2_rear = "AGCAAAAGCAGG"
+
+# Barcode sequences
+#BC to RG throes error: what():  Could not find RG01 in pre-built or custom barcode sequences
+#Expression to capture front and rear barcodes as per dorado use case
+barcode1_pattern = "BC%02i"
+barcode2_pattern = "BC%02i"
+first_index = 1
+last_index = 24
+
+## Scoring options
+[scoring]
+max_barcode_penalty = 11
+barcode_end_proximity = 75
+min_barcode_penalty_dist = 3
+min_separation_only_dist = 6
+flank_left_pad = 5
+flank_right_pad = 10
+front_barcode_window = 175
+rear_barcode_window = 175
