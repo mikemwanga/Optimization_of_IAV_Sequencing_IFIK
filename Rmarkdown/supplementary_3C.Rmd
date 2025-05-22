@@ -1,0 +1,102 @@
+---
+title: "Review_Work"
+output: html_document
+date: "2025-04-04"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r,warning=FALSE, message=FALSE, echo=FALSE}
+library(ggplot2)
+library(dplyr)
+library(grid)
+library(ggpubr)
+library(reshape)
+library(data.table)
+library(stringr)
+
+```
+
+
+```{r}
+
+generate_plot <- function(path){
+          
+          data = read.table(paste0(path, '/IRMA_Summary/assembled-reads-data.tsv'), header=TRUE)
+          data <- data %>%
+                mutate(sample = str_split(sample, "_", simplify = TRUE)[,1])
+          
+          summarised_data_raw <- data %>% dplyr::rename(virus = total_assembled,proportion_virus = assembled) %>%
+                            mutate(non_virus = total_reads - virus,percentage_non_virus = 100 - proportion_virus)
+          
+          summarised_data <- summarised_data_raw %>%
+                            select(sample,virus, non_virus) %>%
+                            tidyr::pivot_longer(cols=c(virus,non_virus), names_to=c('variable'))
+          
+          summarised_data_proportion <- summarised_data_raw %>% 
+                                        select(sample, percentage_non_virus, proportion_virus)%>%
+                            tidyr::pivot_longer(cols=c(proportion_virus,percentage_non_virus), names_to=c('variable'))
+          
+          
+          
+          bcd_order <- paste0("BC",str_pad(1:24,2,pad="0"))
+          
+          
+          
+          axis_text_size=6
+          figure <- ggplot(summarised_data,aes(x=value,y=factor(sample,levels=rev(bcd_order)),fill = variable))  +
+            geom_bar(stat='identity', width = 0.75, position ='stack') +
+            theme_classic() +
+            labs(fill='',x='No. of Reads', title='Dual-barcode') +
+            scale_fill_manual(values = c("non_virus"="#b2182b", "virus"="#bababa"),
+                              labels = c("non_virus" = "Non-Viral",
+                                         "virus" = "Viral"))+
+            theme(axis.title.y = element_blank(),axis.title.x = element_text(size=7),
+                  plot.title = element_text(hjust = 0.5, size=7, color = 'black'),
+                  axis.text = element_text(size=axis_text_size, color='black'),
+                  legend.text = element_text(size=axis_text_size),
+                  legend.key.size = unit(2, "mm"),
+                  legend.position = c(0.9,0.5))
+          
+          
+          
+          figure_proportion <- ggplot(summarised_data_proportion,
+                                      aes(x=value,y=factor(sample,levels=rev(bcd_order)),fill = variable))  +
+            geom_bar(stat='identity', width = 0.75, position ='stack') +
+            theme_classic() +
+            labs(fill='',x='Proportion of Reads (%)',title='Dual-barcode') +
+            scale_fill_manual(values = c("percentage_non_virus"="#b2182b", "proportion_virus"="#bababa"),
+                              labels = c("percentage_non_virus" = "Non-Viral",
+                                         "proportion_virus" = "Viral"))+
+            theme(axis.title.y = element_blank(),axis.title.x = element_text(size=7),
+                  plot.title = element_text(hjust = 0.5, size=7, color = 'black'),
+                  axis.text = element_text(size=axis_text_size, color='black'),
+                  legend.key.size = unit(2, "mm"),
+                  legend.position = c(0.9,0.5))
+          
+          
+          ggsave(paste0(path,'/viral_non_viral_raw.pdf'),plot= figure,
+                 width=90,height=90, units="mm")
+          ggsave(paste0(path,'/viral_non_viral_proportion.pdf'),plot= figure_proportion,
+                          width=90,height=90, units="mm")
+}
+
+
+dirs <- list.dirs(path = ".", full.names = TRUE, recursive = FALSE)
+
+for (path in dirs) {
+  
+  generate_plot(path)
+}
+
+
+
+```
+
+
+
+
+
