@@ -1,4 +1,4 @@
-barcode	condition	dilution	B_replicate	total_reads	total_assembled	non_virus_reads	sample	HA	MP	NA	NP	NS	PA	PB1	PB2
+barcode	protocol	dilution	B_replicate	total_reads	total_assembled	non_virus_reads	sample	HA	MP	NA	NP	NS	PA	PB1	PB2
 barcode01	Zhou_2P	E1	1	8285	8219	66	barcode01	1133.0	4793	610	833	465	160	54.0	171
 barcode02	Zhou_2P	E2	1	8297	8234	63	barcode02	1110.0	4904	619	781	492	130	54.0	144
 barcode03	Zhou_2P	E3	1	8327	8117	210	barcode03	942.0	5053	541	734	592	113	31.0	111
