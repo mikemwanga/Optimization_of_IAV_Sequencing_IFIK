@@ -1,91 +1,73 @@
-barcode	sample	name	condition	dilution	B_replicate	total_reads	total_assembled	assembled(%)	non_virus_reads	percentage_non_virus
-barcode01	Zhou_2P_E1_1	Zhou_2P_E1	Zhou_2P	E1	1	188578	185612	98.4	2966	1.6
-barcode02	Zhou_2P_E2_1	Zhou_2P_E2	Zhou_2P	E2	1	208547	205702	98.6	2845	1.4
-barcode03	Zhou_2P_E3_1	Zhou_2P_E3	Zhou_2P	E3	1	125241	120544	96.2	4697	3.8
-barcode04	Zhou_2P_E4_1	Zhou_2P_E4	Zhou_2P	E4	1	163085	159271	97.7	3814	2.3
-barcode05	Zhou_2P_E5_1	Zhou_2P_E5	Zhou_2P	E5	1	105502	102514	97.2	2988	2.8
-barcode06	Zhou_2P_E6_1	Zhou_2P_E6	Zhou_2P	E6	1	36923	35333	95.7	1590	4.3
-barcode07	Zhou_3P_E1_1	Zhou_3P_E1	Zhou_3P	E1	1	127782	125482	98.2	2300	1.8
-barcode08	Zhou_3P_E1_2	Zhou_3P_E1	Zhou_3P	E1	2	171306	168605	98.4	2701	1.6
-barcode09	Zhou_2P_E1_2	Zhou_2P_E1	Zhou_2P	E1	2	167663	164856	98.3	2807	1.7
-barcode10	Zhou_2P_E2_2	Zhou_2P_E2	Zhou_2P	E2	2	216239	212803	98.4	3436	1.6
-barcode11	Zhou_2P_E3_2	Zhou_2P_E3	Zhou_2P	E3	2	213045	208115	97.7	4930	2.3
-barcode12	Zhou_2P_E4_2	Zhou_2P_E4	Zhou_2P	E4	2	183715	177656	96.7	6059	3.3
-barcode13	Zhou_2P_E5_2	Zhou_2P_E5	Zhou_2P	E5	2	146739	143297	97.7	3442	2.3
-barcode14	Zhou_2P_E6_2	Zhou_2P_E6	Zhou_2P	E6	2	40477	35008	86.5	5469	13.5
-barcode15	Zhou_3P_E2_1	Zhou_3P_E2	Zhou_3P	E2	1	192422	189478	98.5	2944	1.5
-barcode16	Zhou_3P_E2_2	Zhou_3P_E2	Zhou_3P	E2	2	145598	143173	98.3	2425	1.7
-barcode17	Zhou_2P_E1_3	Zhou_2P_E1	Zhou_2P	E1	3	232652	229043	98.4	3609	1.6
-barcode18	Zhou_2P_E2_3	Zhou_2P_E2	Zhou_2P	E2	3	183722	181073	98.6	2649	1.4
-barcode19	Zhou_2P_E3_3	Zhou_2P_E3	Zhou_2P	E3	3	206741	202453	97.9	4288	2.1
-barcode20	Zhou_2P_E4_3	Zhou_2P_E4	Zhou_2P	E4	3	181957	179055	98.4	2902	1.6
-barcode21	Zhou_2P_E5_3	Zhou_2P_E5	Zhou_2P	E5	3	108603	106054	97.7	2549	2.3
-barcode22	Zhou_2P_E6_3	Zhou_2P_E6	Zhou_2P	E6	3	30751	29526	96.0	1225	4.0
-barcode23	Zhou_3P_E3_1	Zhou_3P_E3	Zhou_3P	E3	1	170092	167203	98.3	2889	1.7
-barcode24	Zhou_3P_E3_2	Zhou_3P_E3	Zhou_3P	E3	2	159431	156806	98.4	2625	1.6
-barcode25	Rambo_3P_E1_1	Rambo_3P_E1	Rambo_3P	E1	1	244556	238811	97.7	5745	2.3
-barcode26	Rambo_3P_E2_1	Rambo_3P_E2	Rambo_3P	E2	1	193857	190065	98.0	3792	2.0
-barcode27	Rambo_3P_E3_1	Rambo_3P_E3	Rambo_3P	E3	1	199776	195994	98.1	3782	1.9
-barcode28	Rambo_3P_E4_1	Rambo_3P_E4	Rambo_3P	E4	1	126496	121265	95.9	5231	4.1
-barcode29	Rambo_3P_E5_1	Rambo_3P_E5	Rambo_3P	E5	1	61377	56279	91.7	5098	8.3
-barcode30	Rambo_3P_E6_1	Rambo_3P_E6	Rambo_3P	E6	1	40167	27773	69.1	12394	30.9
-barcode31	Zhou_3P_E4_1	Zhou_3P_E4	Zhou_3P	E4	1	153123	149874	97.9	3249	2.1
-barcode32	Zhou_3P_E4_2	Zhou_3P_E4	Zhou_3P	E4	2	213188	208323	97.7	4865	2.3
-barcode33	Rambo_3P_E1_2	Rambo_3P_E1	Rambo_3P	E1	2	181127	176891	97.7	4236	2.3
-barcode34	Rambo_3P_E2_2	Rambo_3P_E2	Rambo_3P	E2	2	147421	144131	97.8	3290	2.2
-barcode35	Rambo_3P_E3_2	Rambo_3P_E3	Rambo_3P	E3	2	147446	144526	98.0	2920	2.0
-barcode36	Rambo_3P_E4_2	Rambo_3P_E4	Rambo_3P	E4	2	134908	130323	96.6	4585	3.4
-barcode37	Rambo_3P_E5_2	Rambo_3P_E5	Rambo_3P	E5	2	83766	74004	88.3	9762	11.7
-barcode38	Rambo_3P_E6_2	Rambo_3P_E6	Rambo_3P	E6	2	57454	33425	58.2	24029	41.8
-barcode39	Zhou_3P_E5_1	Zhou_3P_E5	Zhou_3P	E5	1	114723	112376	98.0	2347	2.0
-barcode40	Zhou_3P_E5_2	Zhou_3P_E5	Zhou_3P	E5	2	113878	110382	96.9	3496	3.1
-barcode41	Rambo_3P_E1_3	Rambo_3P_E1	Rambo_3P	E1	3	194445	190211	97.8	4234	2.2
-barcode42	Rambo_3P_E2_3	Rambo_3P_E2	Rambo_3P	E2	3	145293	142462	98.1	2831	1.9
-barcode43	Rambo_3P_E3_3	Rambo_3P_E3	Rambo_3P	E3	3	150992	148113	98.1	2879	1.9
-barcode44	Rambo_3P_E4_3	Rambo_3P_E4	Rambo_3P	E4	3	118257	114353	96.7	3904	3.3
-barcode45	Rambo_3P_E5_3	Rambo_3P_E5	Rambo_3P	E5	3	90685	78412	86.5	12273	13.5
-barcode46	Rambo_3P_E6_3	Rambo_3P_E6	Rambo_3P	E6	3	35473	26852	75.7	8621	24.3
-barcode47	Zhou_3P_E6_1	Zhou_3P_E6	Zhou_3P	E6	1	53788	53376	99.2	412	0.8
-barcode48	Zhou_3P_E6_2	Zhou_3P_E6	Zhou_3P	E6	2	65108	64131	98.5	977	1.5
-barcode49	Licheri_2uM_E1_1	Licheri_2uM_E1	Licheri_2uM	E1	1	175006	173781	99.3	1225	0.7
-barcode50	Licheri_2uM_E2_1	Licheri_2uM_E2	Licheri_2uM	E2	1	136940	135742	99.1	1198	0.9
-barcode51	Licheri_2uM_E3_1	Licheri_2uM_E3	Licheri_2uM	E3	1	73907	73236	99.1	671	0.9
-barcode52	Licheri_2uM_E4_1	Licheri_2uM_E4	Licheri_2uM	E4	1	68333	67779	99.2	554	0.8
-barcode53	Licheri_2uM_E5_1	Licheri_2uM_E5	Licheri_2uM	E5	1	31758	31601	99.5	157	0.5
-barcode54	Licheri_2uM_E6_1	Licheri_2uM_E6	Licheri_2uM	E6	1	5256	5188	98.7	68	1.3
-barcode55	Zhou_3P_E1_3	Zhou_3P_E1	Zhou_3P	E1	3	112085	109905	98.1	2180	1.9
-barcode57	Licheri_2uM_E1_2	Licheri_2uM_E1	Licheri_2uM	E1	2	181481	179952	99.2	1529	0.8
-barcode58	Licheri_2uM_E2_2	Licheri_2uM_E2	Licheri_2uM	E2	2	110652	109647	99.1	1005	0.9
-barcode59	Licheri_2uM_E3_2	Licheri_2uM_E3	Licheri_2uM	E3	2	127013	125956	99.2	1057	0.8
-barcode60	Licheri_2uM_E4_2	Licheri_2uM_E4	Licheri_2uM	E4	2	57497	57048	99.2	449	0.8
-barcode61	Licheri_2uM_E5_2	Licheri_2uM_E5	Licheri_2uM	E5	2	43428	43198	99.5	230	0.5
-barcode62	Licheri_2uM_E6_2	Licheri_2uM_E6	Licheri_2uM	E6	2	11900	11428	96.0	472	4.0
-barcode63	Zhou_3P_E2_3	Zhou_3P_E2	Zhou_3P	E2	3	184433	181572	98.4	2861	1.6
-barcode65	Licheri_2uM_E1_3	Licheri_2uM_E1	Licheri_2uM	E1	3	128852	127800	99.2	1052	0.8
-barcode66	Licheri_2uM_E2_3	Licheri_2uM_E2	Licheri_2uM	E2	3	113085	112095	99.1	990	0.9
-barcode67	Licheri_2uM_E3_3	Licheri_2uM_E3	Licheri_2uM	E3	3	116339	115399	99.2	940	0.8
-barcode68	Licheri_2uM_E4_3	Licheri_2uM_E4	Licheri_2uM	E4	3	61248	60758	99.2	490	0.8
-barcode69	Licheri_2uM_E5_3	Licheri_2uM_E5	Licheri_2uM	E5	3	19505	19388	99.4	117	0.6
-barcode70	Licheri_2uM_E6_3	Licheri_2uM_E6	Licheri_2uM	E6	3	4265	4167	97.7	98	2.3
-barcode71	Zhou_3P_E3_3	Zhou_3P_E3	Zhou_3P	E3	3	152173	150127	98.7	2046	1.3
-barcode73	Licheri_5uM_E1_1	Licheri_5uM_E1	Licheri_5uM	E1	1	145333	142718	98.2	2615	1.8
-barcode74	Licheri_5uM_E2_1	Licheri_5uM_E2	Licheri_5uM	E2	1	179240	176796	98.6	2444	1.4
-barcode75	Licheri_5uM_E3_1	Licheri_5uM_E3	Licheri_5uM	E3	1	160317	158579	98.9	1738	1.1
-barcode76	Licheri_5uM_E4_1	Licheri_5uM_E4	Licheri_5uM	E4	1	78132	77281	98.9	851	1.1
-barcode77	Licheri_5uM_E5_1	Licheri_5uM_E5	Licheri_5uM	E5	1	34164	33921	99.3	243	0.7
-barcode78	Licheri_5uM_E6_1	Licheri_5uM_E6	Licheri_5uM	E6	1	14027	13945	99.4	82	0.6
-barcode79	Zhou_3P_E4_3	Zhou_3P_E4	Zhou_3P	E4	3	166689	162124	97.3	4565	2.7
-barcode81	Licheri_5uM_E1_2	Licheri_5uM_E1	Licheri_5uM	E1	2	257408	253680	98.6	3728	1.4
-barcode82	Licheri_5uM_E2_2	Licheri_5uM_E2	Licheri_5uM	E2	2	202788	199792	98.5	2996	1.5
-barcode83	Licheri_5uM_E3_2	Licheri_5uM_E3	Licheri_5uM	E3	2	245624	242973	98.9	2651	1.1
-barcode84	Licheri_5uM_E4_2	Licheri_5uM_E4	Licheri_5uM	E4	2	145374	143862	99.0	1512	1.0
-barcode85	Licheri_5uM_E5_2	Licheri_5uM_E5	Licheri_5uM	E5	2	62618	62190	99.3	428	0.7
-barcode86	Licheri_5uM_E6_2	Licheri_5uM_E6	Licheri_5uM	E6	2	23552	23385	99.3	167	0.7
-barcode87	Zhou_3P_E5_3	Zhou_3P_E5	Zhou_3P	E5	3	64349	61901	96.2	2448	3.8
-barcode89	Licheri_5uM_E1_3	Licheri_5uM_E1	Licheri_5uM	E1	3	211142	207655	98.3	3487	1.7
-barcode90	Licheri_5uM_E2_3	Licheri_5uM_E2	Licheri_5uM	E2	3	206771	203744	98.5	3027	1.5
-barcode91	Licheri_5uM_E3_3	Licheri_5uM_E3	Licheri_5uM	E3	3	159190	157062	98.7	2128	1.3
-barcode92	Licheri_5uM_E4_3	Licheri_5uM_E4	Licheri_5uM	E4	3	84371	83561	99.0	810	1.0
-barcode93	Licheri_5uM_E5_3	Licheri_5uM_E5	Licheri_5uM	E5	3	60686	60270	99.3	416	0.7
-barcode94	Licheri_5uM_E6_3	Licheri_5uM_E6	Licheri_5uM	E6	3	11067	10973	99.2	94	0.8
-barcode95	Zhou_3P_E6_3	Zhou_3P_E6	Zhou_3P	E6	3	73051	71377	97.7	1674	2.3
+barcode	condition	dilution	B_replicate	total_reads	total_assembled	non_virus_reads
+barcode01	Zhou_2P	E1	1	165602	163251	2351
+barcode02	Zhou_2P	E2	1	183017	180785	2232
+barcode03	Zhou_2P	E3	1	109634	106107	3527
+barcode04	Zhou_2P	E4	1	142447	139608	2839
+barcode05	Zhou_2P	E5	1	92814	90412	2402
+barcode06	Zhou_2P	E6	1	32687	31323	1364
+barcode07	Zhou_3P	E1	1	112541	110714	1827
+barcode08	Zhou_3P	E1	2	150349	148208	2141
+barcode09	Zhou_2P	E1	2	147602	145409	2193
+barcode10	Zhou_2P	E2	2	189766	187030	2736
+barcode11	Zhou_2P	E3	2	186360	182654	3706
+barcode12	Zhou_2P	E4	2	160112	155597	4515
+barcode13	Zhou_2P	E5	2	129056	126295	2761
+barcode14	Zhou_2P	E6	2	35922	31211	4711
+barcode15	Zhou_3P	E2	1	169014	166715	2299
+barcode16	Zhou_3P	E2	2	128093	126148	1945
+barcode17	Zhou_2P	E1	3	203975	201165	2810
+barcode18	Zhou_2P	E2	3	160947	158854	2093
+barcode19	Zhou_2P	E3	3	180665	177360	3305
+barcode20	Zhou_2P	E4	3	159266	157034	2232
+barcode21	Zhou_2P	E5	3	95018	93060	1958
+barcode22	Zhou_2P	E6	3	27507	26453	1054
+barcode23	Zhou_3P	E3	1	149341	147086	2255
+barcode24	Zhou_3P	E3	2	140033	138007	2026
+barcode25	Rambo_3P	E1	1	214527	209989	4538
+barcode26	Rambo_3P	E2	1	170090	167067	3023
+barcode27	Rambo_3P	E3	1	175516	172506	3010
+barcode28	Rambo_3P	E4	1	111076	106756	4320
+barcode29	Rambo_3P	E5	1	54329	49944	4385
+barcode30	Rambo_3P	E6	1	35733	24931	10802
+barcode31	Zhou_3P	E4	1	134250	131786	2464
+barcode32	Zhou_3P	E4	2	186796	183221	3575
+barcode33	Rambo_3P	E1	2	158840	155587	3253
+barcode34	Rambo_3P	E2	2	129426	126860	2566
+barcode35	Rambo_3P	E3	2	129284	126969	2315
+barcode36	Rambo_3P	E4	2	118699	114853	3846
+barcode37	Rambo_3P	E5	2	73972	65554	8418
+barcode38	Rambo_3P	E6	2	50857	30034	20823
+barcode39	Zhou_3P	E5	1	100690	98846	1844
+barcode40	Zhou_3P	E5	2	99698	97030	2668
+barcode41	Rambo_3P	E1	3	170370	167023	3347
+barcode42	Rambo_3P	E2	3	127648	125446	2202
+barcode43	Rambo_3P	E3	3	132482	130187	2295
+barcode44	Rambo_3P	E4	3	103796	100596	3200
+barcode45	Rambo_3P	E5	3	79849	69281	10568
+barcode46	Rambo_3P	E6	3	31573	24119	7454
+barcode47	Zhou_3P	E6	1	47704	47373	331
+barcode48	Zhou_3P	E6	2	57511	56709	802
+barcode55	Zhou_3P	E1	3	98315	96590	1725
+barcode63	Zhou_3P	E2	3	161870	159653	2217
+barcode71	Zhou_3P	E3	3	133828	132195	1633
+barcode73	Licheri_5uM	E1	1	127216	125183	2033
+barcode74	Licheri_5uM	E2	1	157461	155536	1925
+barcode75	Licheri_5uM	E3	1	140885	139509	1376
+barcode76	Licheri_5uM	E4	1	69093	68418	675
+barcode77	Licheri_5uM	E5	1	30249	30061	188
+barcode78	Licheri_5uM	E6	1	12804	12741	63
+barcode79	Zhou_3P	E4	3	146182	142753	3429
+barcode81	Licheri_5uM	E1	2	225770	222854	2916
+barcode82	Licheri_5uM	E2	2	178151	175792	2359
+barcode83	Licheri_5uM	E3	2	215686	213620	2066
+barcode84	Licheri_5uM	E4	2	127813	126614	1199
+barcode85	Licheri_5uM	E5	2	55266	54918	348
+barcode86	Licheri_5uM	E6	2	21182	21054	128
+barcode87	Zhou_3P	E5	3	56524	54666	1858
+barcode89	Licheri_5uM	E1	3	185284	182566	2718
+barcode90	Licheri_5uM	E2	3	181020	178651	2369
+barcode91	Licheri_5uM	E3	3	139504	137877	1627
+barcode92	Licheri_5uM	E4	3	74285	73638	647
+barcode93	Licheri_5uM	E5	3	53728	53391	337
+barcode94	Licheri_5uM	E6	3	10071	9993	78
+barcode95	Zhou_3P	E6	3	64300	62885	1415
