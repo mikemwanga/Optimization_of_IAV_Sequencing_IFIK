@@ -88,15 +88,15 @@ conditions_figure <- ggplot(summarised_data_clean, aes(x=dilution, y=value, fill
 path='../data/'
 data_raw = read.table(paste0(path, 'gene_count_edited.tsv'), header=TRUE)
 
-data_raw = data_raw %>% filter(protocol != 'Licheri_2uM') 
+#data_raw = data_raw %>% filter(protocol != 'Licheri_2uM') 
 
 #with viral
 summarised_data = data_raw %>%  mutate(non_viral =total_reads-total_assembled ) %>%
-        select(Dilution,protocol,non_viral,PB2,PB1,PA, HA,NP,NA.,MP,NS) %>%
+        select(dilution,protocol,non_viral,PB2,PB1,PA, HA,NP,NA.,MP,NS) %>%
         pivot_longer(cols = c(non_viral,HA, MP, "NA.", NP, NS, PA, PB1, PB2), names_to="variable", values_to='value')  %>%
-        group_by(protocol, Dilution,variable) %>%
+        group_by(protocol, dilution,variable) %>%
         summarise(avg_value = mean(value, na.rm = TRUE), .groups = "drop" ) %>%
-          group_by(protocol, Dilution) %>%
+          group_by(protocol, dilution) %>%
           mutate(proportion = 100 * avg_value / sum(avg_value, na.rm = TRUE) )
             
 
@@ -104,9 +104,9 @@ summarised_data = data_raw %>%  mutate(non_viral =total_reads-total_assembled ) 
 data <- data_raw %>% pivot_longer(cols = c(HA, MP, "NA.", NP, NS, PA, PB1, PB2),  # adjust gene column names as needed
                names_to = "variable",
                values_to = "value") %>% 
-            group_by(protocol, Dilution, variable) %>%
+            group_by(protocol, dilution, variable) %>%
           summarise(avg_value = mean(value, na.rm = TRUE), .groups = "drop" ) %>%
-          group_by(protocol, Dilution) %>%
+          group_by(protocol, dilution) %>%
         mutate(proportion = 100* avg_value / sum(avg_value, na.rm = TRUE))
 
 
@@ -123,7 +123,7 @@ order=c('Non_Viral','PB2','PB1','PA','HA','NP','NA','MP','NS')
 
 generate_proportion_figure <- function(data,y_title){
   
-        data$Dilution <- factor(data$Dilution, levels = c('E1','E2','E3','E4','E5','E6' ))
+        data$dilution <- factor(data$dilution, levels = c('E1','E2','E3','E4','E5','E6' ))
         dilutionorder=c('E1','E2','E3','E4','E5')
         order=c('non_viral','PB2','PB1','PA','HA','NP','NA','MP','NS')
         data$variable[data$variable == "NA."] <- "NA"
@@ -134,7 +134,7 @@ generate_proportion_figure <- function(data,y_title){
         
         figure <- ggplot(data, aes(fill=factor(variable,levels=order,
                                                labels = c('Non-Viral','PB2','PB1','PA','HA','NP','NA','MP','NS')),
-                                   x=Dilution, y=proportion)) +  
+                                   x=dilution, y=proportion)) +  
             geom_bar(position="stack", stat="identity",width =barsize) +
             labs(fill='',y=y_title) +
             facet_wrap(~protocol, nrow=1) +
